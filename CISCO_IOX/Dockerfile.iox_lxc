@@ -1,0 +1,29 @@
+# DISCLAIMER: This build script is intended for demonstration purposes only and is provided as-is with
+# no warranty or support of any kind. Running the build script may result in third party software components
+# being downloaded and installed on your system. It is your responsibility to ensure that you have all the
+# necessary rights and permissions to use any such third party software. Cisco Systems, Inc., makes no representation
+# about and assumes no liability for any such third party software, including with regard to intellectual property
+# rights, licensing, malware, security, quality, functionality, suitability, and performance.
+# All use of the build script and any third party software is at your own risk.
+
+# Pull PerfSONAR github perfsonar/testpoint-docker image built using "sudo make build"
+# from "https://github.com/perfsonar/perfsonar-testpoint-docker.git"
+FROM perfsonar/testpoint
+MAINTAINER John Tai, Jr. <johntai@cisco.com>
+
+# Build Cisco IOx LXC version of perfsonar/testpoint-docker
+
+# Copy IOx Scripts
+COPY iox_start.sh /etc/init.d/iox_start.sh
+
+# Append IOx bootup daemons
+COPY iox_supervisord.conf /etc/iox_supervisord.conf
+RUN cat /etc/iox_supervisord.conf >> /etc/supervisord.conf
+
+# Cisco linux host does not use ntpd. Must set "allow_unsync" to allow PerfSonar tests to run.
+# Cisco IOS configurations must setup ntp to the same NTP servers required for PerfSONAR agent.
+RUN sed -i -e "s/\#allow_unsync/allow_unsync/" /etc/bwctl-server/bwctl-server.conf
+
+# Setup app-hosting console login as "root", pasword "cisco"
+RUN echo "cisco" | passwd root --stdin
+
