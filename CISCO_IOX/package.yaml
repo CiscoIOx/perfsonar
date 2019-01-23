@@ -1,14 +1,13 @@
-descriptor-schema-version: "2.6"
+descriptor-schema-version: "2.9"
 info:
-  name: perfsonar-lxc
-  description: PerfSONAR 4.0 Cisco IOx LXC
-  version: "1.0.0"
+  name: perfsonar
+  description: Cisco IOx PerfSONAR Application
+  version: "1.1.0"
   author-name: Cisco
 app:
-  # Indicate app type (vm, paas, lxc etc.,)
+  # Indicate app type (vm, docker)
   cpuarch: x86_64
-  type: lxc
-  kernel-version: 4.4.51
+  type: docker
 
   env:
     PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -19,23 +18,20 @@ app:
   resources:
     profile: custom
     vcpu: "2"
-    cpu: "7400"
-    disk: "10"
+    cpu: "4000"
+    disk: "1"
     memory: "2048"
+
+    ramfs:
+      size: "64"
 
     network:
     - interface-name: eth0
+      type: external
+      hint: "Application Public External Interface"
       ports: {}
-
-    filesystem:
-      -
-        fstype: ram
-        source:
-          usage: 64
-        target: /dev/shm
-        accessmode: squash
 
 # Specify runtime and startup
   startup:
-    rootfs: rootfs.img
+    rootfs: rootfs.tar
     target: /etc/init.d/iox_start.sh
